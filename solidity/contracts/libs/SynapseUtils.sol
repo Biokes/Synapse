@@ -40,4 +40,9 @@ library SynapseUtils{
         }
     }
 
+    function supportsInterface(bytes4 _interfaceId) internal view returns (bool) {
+        DiamondStorage storage ds = getDiamondStorage();
+        return ds._facets[_interfaceId] != address(0);
+    }
+
 }
