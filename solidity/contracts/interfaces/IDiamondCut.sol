@@ -1,18 +1,6 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.38;
-
-interface IDiamond {
-
-    enum FacetCutAction{
-        ADD, REPLACE,REMOVE
-    }
-
-    struct FacetCut{
-        address facetAddress;
-        FacetCutAction action;
-        bytes4[] functionSelectors;
-    }
-
-    event DiamondCut(FacetCut[] _diamondCut, address _initializer, bytes callData);
-    
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.28;
+import {IDiamond} from "./IDiamond.sol";
+interface IDiamondCut is IDiamond{
+    function facetCut(FacetCut[] calldata _facetAddress, address facetAddress, bytes calldata _calldata) external;
 }
