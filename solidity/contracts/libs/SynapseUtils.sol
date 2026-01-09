@@ -45,8 +45,35 @@ library SynapseUtils{
         return ds._facets[_interfaceId] != address(0);
     }
 
-    function facetAddress(bytes4 _functionSelector) internal view returns (address) {
+    function getFacetAddress(bytes4 _functionSelector) internal view returns (address) {
         DiamondStorage storage ds = getDiamondStorage();
         return ds._facets[_functionSelector];
+    }
+
+    function getFacetsAddresses() internal view returns (address[] memory) {
+        DiamondStorage storage ds = getDiamondStorage();
+        address[] memory temp = new address[](ds._selectors.length);
+        uint256 uniqueCount = 0;
+        for (uint256 i = 0; i < ds._selectors.length; i++) {
+            address facetAddr = ds._facets[ds._selectors[i]];
+            bool alreadyAdded = false;
+            for (uint256 j = 0; j < uniqueCount; j++) {
+                if (temp[j] == facetAddr) {
+                    alreadyAdded = true;
+                    break;
+                }
+            }
+            if (!alreadyAdded) {
+                temp[uniqueCount] = facetAddr;
+                uniqueCount++;
+            }
+        }
+
+        address[] memory unique = new address[](uniqueCount);
+        for (uint256 i = 0; i < uniqueCount; i++) {
+            unique[i] = temp[i];
+        }
+
+        return unique;
     }
 }

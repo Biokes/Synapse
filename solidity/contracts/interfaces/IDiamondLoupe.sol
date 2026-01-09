@@ -8,10 +8,10 @@ interface IDiamondLoupe{
         bytes4[] functionSelectors;
     }
 
-    function facets() external view returns (Facet[] memory facets_);
-    function facetFunctionSelectors(address _facet) external view returns (bytes4[] memory facetFunctionSelectors);
-    function facetAddresses() external view returns (address[] memory facetAddresses);
-    function facetAddress(bytes4 _functionSelector) external view returns (address facetAddress);
+    function getFacets() external view returns (Facet[] memory facets_);
+    function getFacetFunctionSelectors(address _facet) external view returns (bytes4[] memory facetFunctionSelectors);
+    function getFacetAddresses() external view returns (address[] memory facetAddresses);
+    function getFacetAddress(bytes4 _functionSelector) external view returns (address facetAddress);
     function supportsInterface(bytes4 _interfaceId) external view returns (bool isSupported);
-    
+
 }
