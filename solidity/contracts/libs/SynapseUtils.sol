@@ -3,9 +3,9 @@ pragma solidity ^0.8.28;
 
 library SynapseUtils{
 
-    bytes32 constant SYNAPSE_STORAGE = keccak256("Synapse.diamond.storage");
+    bytes32 constant SYNAPSE_DIAMOND_STORAGE = keccak256("Synapse.diamond.storage");
     
-    struct DiamonsStorage {
+    struct DiamondStorage {
         address _owner;
         mapping (bytes4 => address) _facets;
         mapping (address => bytes4[]) _facetFunctionSelectors;
@@ -13,7 +13,7 @@ library SynapseUtils{
     }
 
      function getDiamondStorage() internal pure returns (DiamondStorage storage ds) {
-        bytes32 position = DIAMOND_STORAGE_POSITION;
+        bytes32 position = SYNAPSE_DIAMOND_STORAGE;
         assembly {
             ds.slot := position
         }
