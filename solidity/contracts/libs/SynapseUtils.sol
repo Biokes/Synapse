@@ -76,4 +76,9 @@ library SynapseUtils{
 
         return unique;
     }
+
+    function getFacetFunctionSelectors(address _facet) internal view returns (bytes4[] memory) {
+        DiamondStorage storage ds = getDiamondStorage();
+        return ds._facetFunctionSelectors[_facet];
+    }
 }
