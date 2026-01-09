@@ -12,6 +12,11 @@ library SynapseUtils{
         bytes4[] _selectors;
     }
 
-    
+     function getDiamondStorage() internal pure returns (DiamondStorage storage ds) {
+        bytes32 position = DIAMOND_STORAGE_POSITION;
+        assembly {
+            ds.slot := position
+        }
+    }
 
 }
