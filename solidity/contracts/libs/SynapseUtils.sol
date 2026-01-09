@@ -34,7 +34,6 @@ library SynapseUtils{
                 removeFacet(ds, facet_address, facetCut.functionSelectors);
             }
         }
-
         if (_init != address(0)) {
             (bool success,) = _init.delegatecall(_calldata);
             require(success, "Diamodcut Initialization failed");
