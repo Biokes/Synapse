@@ -45,4 +45,8 @@ library SynapseUtils{
         return ds._facets[_interfaceId] != address(0);
     }
 
+    function facetAddress(bytes4 _functionSelector) internal view returns (address) {
+        DiamondStorage storage ds = getDiamondStorage();
+        return ds._facets[_functionSelector];
+    }
 }
