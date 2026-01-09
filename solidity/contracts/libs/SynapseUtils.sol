@@ -81,4 +81,15 @@ library SynapseUtils{
         DiamondStorage storage ds = getDiamondStorage();
         return ds._facetFunctionSelectors[_facet];
     }
+
+    function getFacets() internal view returns (IDiamondLoupe.Facet[] memory facets_) {
+        facets_ = new IDiamondLoupe.Facet[](facetAddresses().length);
+        for (uint256 i = 0; i < facets_.length; i++) {
+            address facetAddress_ = facetAddresses()[i];
+            facets_[i] = IDiamondLoupe.Facet({
+                facetAddress: facetAddress_,
+                functionSelectors: facetFunctionSelectors(facetAddress_)
+            });
+        }
+    }
 }
