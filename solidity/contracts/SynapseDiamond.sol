@@ -2,8 +2,10 @@
 pragma solidity ^0.8.30;
 
 import {SynapseUtils} from "./libs/SynapseUtils.sol";
+import {IDiamond} from "./interfaces/IDiamond.sol";
+import {IDiamondLoupe} from "./interfaces/IDiamondLoupe.sol";
 
-contract SynapseDiamond{
+contract SynapseDiamond  is IDiamondCut, IDiamondLoupe{
     using SynapseUtils for SynapseUtils.DiamondStorage;
 
     constructor(address diamondCut){
@@ -13,7 +15,7 @@ contract SynapseDiamond{
     receive() external payable {}
 
     fallback() external payable {
-        address facet = DiamondLibrary.facetAddress(msg.sig);
+        address facet = SynapseUtils.DiamondStorage._facet(msg.sig);
         require(facet != address(0), "Function not found");
         assembly {
             calldatacopy(0, 0, calldatasize())
