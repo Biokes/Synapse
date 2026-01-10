@@ -1,21 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import {SynapseUtils} from "./libs/SynapseUtils.sol";
+import {SynapseLibrary} from "./libs/SynapseLibrary.sol";
 import {IDiamond} from "./interfaces/IDiamond.sol";
 import {IDiamondLoupe} from "./interfaces/IDiamondLoupe.sol";
 
 contract SynapseDiamond  is IDiamondCut, IDiamondLoupe{
-    using SynapseUtils for SynapseUtils.DiamondStorage;
+    using SynapseLibrary for SynapseLibrary.DiamondStorage;
 
     constructor(address diamondCut){
-
+        SynapseLibrary.DiamondStorage storage contractStorage = SynapseLibrary.DiamondStorage;
+        contractSorage._owner = msg.sender; 
     }
 
     receive() external payable {}
 
     fallback() external payable {
-        address facet = SynapseUtils.DiamondStorage._facet(msg.sig);
+        address facet = SynapseLibrary.DiamondStorage._facet(msg.sig);
         require(facet != address(0), "Function not found");
         assembly {
             calldatacopy(0, 0, calldatasize())

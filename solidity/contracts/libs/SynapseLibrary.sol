@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 import {IDiamond} from "../interfaces/IDiamond.sol";
 
-library SynapseUtils{
+library SynapseLibrary{
 
     bytes32 constant SYNAPSE_DIAMOND_STORAGE = keccak256("Synapse.diamond.storage");
     
