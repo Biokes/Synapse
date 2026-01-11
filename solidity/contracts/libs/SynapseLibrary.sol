@@ -103,4 +103,21 @@ library SynapseLibrary{
         }
         ds._facetFunctionSelectors[_facetAddress] = _functionSelectors;
     }
+    
+    function removeFacet(DiamondStorage storage ds,address _facetAddress,bytes4[] memory _functionSelectors) internal {
+        require(_facetAddress == address(0), "Remove facet address must be zero");
+        for (uint256 i = 0; i < _functionSelectors.length; i++) {
+            bytes4 selector = _functionSelectors[i];
+            require(ds._facets[selector] != address(0), "Function does not exist");
+            delete ds._facets[selector];
+            for (uint256 j = 0; j < ds._selectors.length; j++) {
+                if (ds._selectors[j] == selector) {
+                    ds._selectors[j] = ds._selectors[ds._selectors.length - 1];
+                    ds._selectors.pop();
+                    break;
+                }
+            }
+        }
+        delete ds._facetFunctionSelectors[_facetAddress];
+    }
 }
