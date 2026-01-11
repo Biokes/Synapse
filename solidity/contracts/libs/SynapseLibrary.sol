@@ -120,4 +120,13 @@ library SynapseLibrary{
         }
         delete ds._facetFunctionSelectors[_facetAddress];
     }
+    function replaceFacet(DiamondStorage storage ds,address _facetAddress,bytes4[] memory _functionSelectors) internal {
+        require(_facetAddress != address(0), "Facet address cannot be zero");
+        for (uint256 i = 0; i < _functionSelectors.length; i++) {
+            bytes4 selector = _functionSelectors[i];
+            require(ds._facets[selector] != address(0), "Function does not exist");
+            ds._facets[selector] = _facetAddress;
+        }
+        ds._facetFunctionSelectors[_facetAddress] = _functionSelectors;
+    }
 }
