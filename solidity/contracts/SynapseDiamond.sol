@@ -2,14 +2,14 @@
 pragma solidity ^0.8.30;
 
 import {SynapseLibrary} from "./libs/SynapseLibrary.sol";
-import {IDiamond} from "./interfaces/IDiamond.sol";
+import {IDiamondCut} from "./interfaces/IDiamondCut.sol";
 import {IDiamondLoupe} from "./interfaces/IDiamondLoupe.sol";
 
 contract SynapseDiamond  is IDiamondCut, IDiamondLoupe{
     using SynapseLibrary for SynapseLibrary.DiamondStorage;
 
     constructor(address diamondCut){
-        SynapseLibrary.DiamondStorage storage contractStorage = SynapseLibrary.DiamondStorage;
+        SynapseLibrary.DiamondStorage storage contractStorage = SynapseLibrary.getDiamondStorage();
         contractSorage._owner = msg.sender; 
     }
 

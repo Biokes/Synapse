@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
+pragma solidity ^0.8.30;
 import {IDiamond} from "../interfaces/IDiamond.sol";
+import {IDiamondLoupe} from "../interfaces/IDiamondLoupe.sol";
 
 library SynapseLibrary{
 
@@ -91,5 +92,15 @@ library SynapseLibrary{
                 functionSelectors: facetFunctionSelectors(facetAddress_)
             });
         }
+    }
+    function addFacet(DiamondStorage storage ds,address _facetAddress,bytes4[] memory _functionSelectors) internal {
+        require(_facetAddress != address(0), "Facet address cannot be zero");
+        for (uint256 i = 0; i < _functionSelectors.length; i++) {
+            bytes4 selector = _functionSelectors[i];
+            require(ds._facets[selector] == address(0), "Function already exists");
+            ds._facets[selector] = _facetAddress;
+            ds._selectors.push(selector);
+        }
+        ds._facetFunctionSelectors[_facetAddress] = _functionSelectors;
     }
 }
