@@ -100,4 +100,23 @@ contract EventLifecycleFacet {
         s.reentrancyGuard = 0;
     }
 
+    function getEvent(uint256 eventId) external view returns (
+        address organizer,
+        uint64 startTime,
+        uint64 endTime,
+        uint8 state,
+        uint256 escrowBalance
+    ) {
+        SynapseLibrary.AppStorage storage s = SynapseLibrary.diamondStorage();
+        SynapseLibrary.Event storage evt = s.events[eventId];
+        
+        return (
+            evt.organizer,
+            evt.startTime,
+            evt.endTime,
+            evt.state,
+            evt.escrowBalance
+        );
+    }
+
 }
