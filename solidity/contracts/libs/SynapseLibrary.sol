@@ -29,6 +29,12 @@ library SynapseLibrary{
         bytes4[] _selectors;
     }
 
+    struct AppStorage {
+        uint256 nextEventId;
+        mapping(uint256 => Event) events;
+        uint256 reentrancyGuard;
+    }
+
      function getDiamondStorage() internal pure returns (DiamondStorage storage ds) {
         bytes32 position = SYNAPSE_DIAMOND_STORAGE;
         assembly {
