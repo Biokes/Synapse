@@ -42,6 +42,13 @@ library SynapseLibrary{
         }
     }
     
+    function diamondStorage() internal pure returns (AppStorage storage ds) {
+        bytes32 position = APP_STORAGE_POSITION;
+        assembly {
+            ds.slot := position
+        }
+    }
+    
     function diamondCut(IDiamond.FacetCut[] memory _diamondCut,address _init,bytes memory _calldata) internal {
         DiamondStorage storage ds = getDiamondStorage();
         for (uint256 i = 0; i < _diamondCut.length; i++) {
