@@ -20,8 +20,12 @@ describe("EventLifecycleFacet", function () {
         organizerAddr = await organizer.getAddress();
         otherAddr = await other.getAddress();
 
+        const DiamondCutFacetFactory = await ethers.getContractFactory("DiamondCutFacet");
+        const diamondCutFacet = await DiamondCutFacetFactory.deploy();
+        await diamondCutFacet.waitForDeployment();
+
         const DiamondFactory = await ethers.getContractFactory("SynapseDiamond");
-        diamond = await DiamondFactory.deploy(ethers.ZeroAddress);
+        diamond = await DiamondFactory.deploy(await diamondCutFacet.getAddress());
         await diamond.waitForDeployment();
 
         const EventFacetFactory = await ethers.getContractFactory("EventLifecycleFacet");
