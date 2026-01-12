@@ -6,6 +6,7 @@ import {IDiamondLoupe} from "../interfaces/IDiamondLoupe.sol";
 library SynapseLibrary{
 
     bytes32 constant SYNAPSE_DIAMOND_STORAGE = keccak256("Synapse.diamond.storage");
+    bytes32 constant APP_STORAGE_POSITION = keccak256("Synapse.app.storage");
     
     struct DiamondStorage {
         address _owner;
