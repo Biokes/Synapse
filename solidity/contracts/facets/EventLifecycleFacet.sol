@@ -37,4 +37,18 @@ contract EventLifecycleFacet {
         emit EventCreated(eventId, msg.sender, startTime, endTime);
     }
 
+    function fundEvent(uint256 eventId) external payable {
+        SynapseLibrary.AppStorage storage s = SynapseLibrary.diamondStorage();
+        SynapseLibrary.Event storage evt = s.events[eventId];
+        
+        if (evt.organizer != msg.sender) revert NotOrganizer();
+        if (evt.state != SynapseLibrary.STATE_CREATED) revert InvalidState();
+        if (msg.value == 0) revert InvalidAmount();
+        
+        evt.escrowBalance += msg.value;
+        evt.state = SynapseLibrary.STATE_FUNDED;
+        
+        emit EventFunded(eventId, msg.value);
+    }
+
 }
