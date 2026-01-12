@@ -16,6 +16,12 @@ library SynapseLibrary{
         uint256 escrowBalance;
     }
     
+    uint8 constant STATE_CREATED = 0;
+    uint8 constant STATE_FUNDED = 1;
+    uint8 constant STATE_ACTIVE = 2;
+    uint8 constant STATE_SETTLING = 3;
+    uint8 constant STATE_FINALIZED = 4;
+    
     struct DiamondStorage {
         address _owner;
         mapping (bytes4 => address) _facets;
