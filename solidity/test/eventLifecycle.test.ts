@@ -53,6 +53,52 @@ describe("EventLifecycleFacet", function () {
         await diamondCutFacetInstance.facetCut(cut, ethers.ZeroAddress, "0x");
 
         eventFacet = await ethers.getContractAt("EventLifecycleFacet", await diamond.getAddress());
+
+        // Remove trailing characters to fix formatting error
+    });
+
+    describe("createEvent", function () {
+        it("should create event successfully", async function () {
+            const now = Math.floor(Date.now() / 1000);
+            const startTime = now + 3600;
+            const endTime = startTime + 7200;
+
+            const tx = await eventFacet.connect(organizer).createEvent(startTime, endTime);
+            const receipt = await tx.wait();
+
+            // Check for EventCreated event
+            const event = receipt.logs.find((log: any) => {
+                try {
+                    return eventFacet.interface.parseLog(log)?.name === "EventCreated";
+                } catch (e) {
+                    return false;
+                }
+            });
+            expect(event).to.not.be.undefined;
+
+            const parsedLog = eventFacet.interface.parseLog(event!);
+            expect(parsedLog!.args.organizer).to.equal(organizerAddr);
+            expect(parsedLog!.args.startTime).to.equal(startTime);
+            expect(parsedLog!.args.endTime).to.equal(endTime);
+
+            // Verify state
+            const eventId = parsedLog!.args.eventId;
+            const eventState = await eventFacet.getEvent(eventId);
+            expect(eventState.organizer).to.equal(organizerAddr);
+            expect(eventState.startTime).to.equal(startTime);
+            expect(eventState.endTime).to.equal(endTime);
+            expect(eventState.state).to.equal(0); // Created
+            expect(eventState.escrowBalance).to.equal(0);
+        });
+
+        it("should revert if startTime >= endTime", async function () {
+            const now = Math.floor(Date.now() / 1000);
+            const startTime = now + 3600;
+            const endTime = startTime; // Invalid
+
+            await expect(eventFacet.connect(organizer).createEvent(startTime, endTime))
+                .to.be.revertedWithCustomError(eventFacet, "InvalidTimeRange");
+        });
     });
 });
 
