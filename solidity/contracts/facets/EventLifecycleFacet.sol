@@ -51,4 +51,17 @@ contract EventLifecycleFacet {
         emit EventFunded(eventId, msg.value);
     }
 
+    function activateEvent(uint256 eventId) external {
+        SynapseLibrary.AppStorage storage s = SynapseLibrary.diamondStorage();
+        SynapseLibrary.Event storage evt = s.events[eventId];
+        
+        if (evt.organizer != msg.sender) revert NotOrganizer();
+        if (evt.state != SynapseLibrary.STATE_FUNDED) revert InvalidState();
+        if (block.timestamp < evt.startTime) revert InvalidTimestamp();
+        
+        evt.state = SynapseLibrary.STATE_ACTIVE;
+        
+        emit EventActivated(eventId);
+    }
+
 }
