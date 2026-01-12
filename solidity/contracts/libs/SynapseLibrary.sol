@@ -8,6 +8,14 @@ library SynapseLibrary{
     bytes32 constant SYNAPSE_DIAMOND_STORAGE = keccak256("Synapse.diamond.storage");
     bytes32 constant APP_STORAGE_POSITION = keccak256("Synapse.app.storage");
     
+    struct Event {
+        address organizer;
+        uint64 startTime;
+        uint64 endTime;
+        uint8 state;
+        uint256 escrowBalance;
+    }
+    
     struct DiamondStorage {
         address _owner;
         mapping (bytes4 => address) _facets;
