@@ -5,12 +5,12 @@ import {SynapseLibrary} from "./libs/SynapseLibrary.sol";
 import {IDiamondCut} from "./interfaces/IDiamondCut.sol";
 import {IDiamondLoupe} from "./interfaces/IDiamondLoupe.sol";
 
-contract SynapseDiamond  is IDiamondCut, IDiamondLoupe{
+contract SynapseDiamond {
     using SynapseLibrary for SynapseLibrary.DiamondStorage;
 
     constructor(address diamondCut){
         SynapseLibrary.DiamondStorage storage contractStorage = SynapseLibrary.getDiamondStorage();
-        contractSorage._owner = msg.sender; 
+        contractStorage._owner = msg.sender; 
     }
 
     receive() external payable {}

@@ -27,11 +27,11 @@ library SynapseLibrary{
             IDiamond.FacetCut memory facetCut = _diamondCut[i];
             address facet_address = facetCut.facetAddress;
             IDiamond.FacetCutAction action = facetCut.action;
-            if (action == IDiamond.FacetCutAction.Add) {
+            if (action == IDiamond.FacetCutAction.ADD) {
                 addFacet(ds, facet_address, facetCut.functionSelectors);
-            } else if (action == IDiamond.FacetCutAction.Replace) {
+            } else if (action == IDiamond.FacetCutAction.REPLACE) {
                 replaceFacet(ds, facet_address, facetCut.functionSelectors);
-            } else if (action == IDiamond.FacetCutAction.Remove) {
+            } else if (action == IDiamond.FacetCutAction.REMOVE) {
                 removeFacet(ds, facet_address, facetCut.functionSelectors);
             }
         }
@@ -84,12 +84,12 @@ library SynapseLibrary{
     }
 
     function getFacets() internal view returns (IDiamondLoupe.Facet[] memory facets_) {
-        facets_ = new IDiamondLoupe.Facet[](facetAddresses().length);
+        facets_ = new IDiamondLoupe.Facet[](getFacetsAddresses().length);
         for (uint256 i = 0; i < facets_.length; i++) {
-            address facetAddress_ = facetAddresses()[i];
+            address facetAddress_ = getFacetsAddresses()[i];
             facets_[i] = IDiamondLoupe.Facet({
                 facetAddress: facetAddress_,
-                functionSelectors: facetFunctionSelectors(facetAddress_)
+                functionSelectors: getFacetFunctionSelectors(facetAddress_)
             });
         }
     }
