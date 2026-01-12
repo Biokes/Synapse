@@ -1,6 +1,8 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
+import { network } from "hardhat";
 import { Contract, Signer } from "ethers";
+
+const { ethers } = await network.connect();
 
 describe("EventLifecycleFacet", function () {
     let diamond: Contract;
@@ -17,5 +19,27 @@ describe("EventLifecycleFacet", function () {
         ownerAddr = await owner.getAddress();
         organizerAddr = await organizer.getAddress();
         otherAddr = await other.getAddress();
+
+        const DiamondFactory = await ethers.getContractFactory("SynapseDiamond");
+        diamond = await DiamondFactory.deploy(ethers.ZeroAddress);
+        await diamond.waitForDeployment();
+
+        const EventFacetFactory = await ethers.getContractFactory("EventLifecycleFacet");
+        const eventFacetImpl = await EventFacetFactory.deploy();
+        await eventFacetImpl.waitForDeployment();
+
+        const facetAddress = await eventFacetImpl.getAddress();
+        const selectors = [
+            eventFacetImpl.interface.getFunction("createEvent")!.selector,
+            eventFacetImpl.interface.getFunction("fundEvent")!.selector,
+            eventFacetImpl.interface.getFunction("activateEvent")!.selector,
+            eventFacetImpl.interface.getFunction("beginSettlement")!.selector,
+            eventFacetImpl.interface.getFunction("finalizeEvent")!.selector,
+            eventFacetImpl.interface.getFunction("getEvent")!.selector,
+        ];
+
+        const diamondCutFacet = await ethers.getContractAt("SynapseDiamond", await diamond.getAddress());
+
+        eventFacet = await ethers.getContractAt("EventLifecycleFacet", await diamond.getAddress());
     });
 });
