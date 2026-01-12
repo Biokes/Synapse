@@ -1,0 +1,122 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.30;
+
+import {SynapseLibrary} from "../libs/SynapseLibrary.sol";
+
+error NotOrganizer();
+error InvalidTimeRange();
+error InvalidState();
+error InvalidAmount();
+error InvalidTimestamp();
+error TransferFailed();
+error ReentrancyGuard();
+
+contract EventLifecycleFacet {
+
+    event EventCreated(uint256 indexed eventId, address indexed organizer, uint64 startTime, uint64 endTime);
+    event EventFunded(uint256 indexed eventId, uint256 amount);
+    event EventActivated(uint256 indexed eventId);
+    event EventSettling(uint256 indexed eventId);
+    event EventFinalized(uint256 indexed eventId, uint256 payoutAmount);
+
+    function createEvent(uint64 startTime, uint64 endTime) external returns (uint256 eventId) {
+        if (startTime >= endTime) revert InvalidTimeRange();
+        
+        SynapseLibrary.AppStorage storage s = SynapseLibrary.diamondStorage();
+        
+        eventId = s.nextEventId++;
+        
+        s.events[eventId] = SynapseLibrary.Event({
+            organizer: msg.sender,
+            startTime: startTime,
+            endTime: endTime,
+            state: SynapseLibrary.STATE_CREATED,
+            escrowBalance: 0
+        });
+        
+        emit EventCreated(eventId, msg.sender, startTime, endTime);
+    }
+
+    function fundEvent(uint256 eventId) external payable {
+        SynapseLibrary.AppStorage storage s = SynapseLibrary.diamondStorage();
+        SynapseLibrary.Event storage evt = s.events[eventId];
+        
+        if (evt.organizer != msg.sender) revert NotOrganizer();
+        if (evt.state != SynapseLibrary.STATE_CREATED) revert InvalidState();
+        if (msg.value == 0) revert InvalidAmount();
+        
+        evt.escrowBalance += msg.value;
+        evt.state = SynapseLibrary.STATE_FUNDED;
+        
+        emit EventFunded(eventId, msg.value);
+    }
+
+    function activateEvent(uint256 eventId) external {
+        SynapseLibrary.AppStorage storage s = SynapseLibrary.diamondStorage();
+        SynapseLibrary.Event storage evt = s.events[eventId];
+        
+        if (evt.organizer != msg.sender) revert NotOrganizer();
+        if (evt.state != SynapseLibrary.STATE_FUNDED) revert InvalidState();
+        if (block.timestamp < evt.startTime) revert InvalidTimestamp();
+        
+        evt.state = SynapseLibrary.STATE_ACTIVE;
+        
+        emit EventActivated(eventId);
+    }
+
+    function beginSettlement(uint256 eventId) external {
+        SynapseLibrary.AppStorage storage s = SynapseLibrary.diamondStorage();
+        SynapseLibrary.Event storage evt = s.events[eventId];
+        
+        if (evt.organizer != msg.sender) revert NotOrganizer();
+        if (evt.state != SynapseLibrary.STATE_ACTIVE) revert InvalidState();
+        if (block.timestamp < evt.endTime) revert InvalidTimestamp();
+        
+        evt.state = SynapseLibrary.STATE_SETTLING;
+        
+        emit EventSettling(eventId);
+    }
+
+    function finalizeEvent(uint256 eventId) external {
+        SynapseLibrary.AppStorage storage s = SynapseLibrary.diamondStorage();
+        
+        if (s.reentrancyGuard == 1) revert ReentrancyGuard();
+        s.reentrancyGuard = 1;
+        
+        SynapseLibrary.Event storage evt = s.events[eventId];
+        
+        if (evt.organizer != msg.sender) revert NotOrganizer();
+        if (evt.state != SynapseLibrary.STATE_SETTLING) revert InvalidState();
+        
+        uint256 payout = evt.escrowBalance;
+        evt.escrowBalance = 0;
+        evt.state = SynapseLibrary.STATE_FINALIZED;
+        
+        emit EventFinalized(eventId, payout);
+        
+        (bool success, ) = evt.organizer.call{value: payout}("");
+        if (!success) revert TransferFailed();
+        
+        s.reentrancyGuard = 0;
+    }
+
+    function getEvent(uint256 eventId) external view returns (
+        address organizer,
+        uint64 startTime,
+        uint64 endTime,
+        uint8 state,
+        uint256 escrowBalance
+    ) {
+        SynapseLibrary.AppStorage storage s = SynapseLibrary.diamondStorage();
+        SynapseLibrary.Event storage evt = s.events[eventId];
+        
+        return (
+            evt.organizer,
+            evt.startTime,
+            evt.endTime,
+            evt.state,
+            evt.escrowBalance
+        );
+    }
+
+}

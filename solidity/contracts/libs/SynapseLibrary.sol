@@ -6,6 +6,21 @@ import {IDiamondLoupe} from "../interfaces/IDiamondLoupe.sol";
 library SynapseLibrary{
 
     bytes32 constant SYNAPSE_DIAMOND_STORAGE = keccak256("Synapse.diamond.storage");
+    bytes32 constant APP_STORAGE_POSITION = keccak256("Synapse.app.storage");
+    
+    struct Event {
+        address organizer;
+        uint64 startTime;
+        uint64 endTime;
+        uint8 state;
+        uint256 escrowBalance;
+    }
+    
+    uint8 constant STATE_CREATED = 0;
+    uint8 constant STATE_FUNDED = 1;
+    uint8 constant STATE_ACTIVE = 2;
+    uint8 constant STATE_SETTLING = 3;
+    uint8 constant STATE_FINALIZED = 4;
     
     struct DiamondStorage {
         address _owner;
@@ -14,8 +29,21 @@ library SynapseLibrary{
         bytes4[] _selectors;
     }
 
+    struct AppStorage {
+        uint256 nextEventId;
+        mapping(uint256 => Event) events;
+        uint256 reentrancyGuard;
+    }
+
      function getDiamondStorage() internal pure returns (DiamondStorage storage ds) {
         bytes32 position = SYNAPSE_DIAMOND_STORAGE;
+        assembly {
+            ds.slot := position
+        }
+    }
+    
+    function diamondStorage() internal pure returns (AppStorage storage ds) {
+        bytes32 position = APP_STORAGE_POSITION;
         assembly {
             ds.slot := position
         }
