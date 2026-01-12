@@ -94,14 +94,14 @@ Synapse
 ├── Ticket Module
 ├── Role & Labor Module
 ├── Escrow & Settlement Module
-└── Reputation Module
+└── Reputation Module (optional)
 ```
 
 Each module is independently deployable, composable across events, and upgradeable via governance.
 
 ## Why Base?
 
-Synapse is built on Base to leverage:
+Synapse is deployed on Base to leverage:
 - Low fees for high-frequency event interactions
 - Fast confirmations for live operations
 - Ethereum security guarantees
