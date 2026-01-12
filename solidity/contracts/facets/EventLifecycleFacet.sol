@@ -77,4 +77,27 @@ contract EventLifecycleFacet {
         emit EventSettling(eventId);
     }
 
+    function finalizeEvent(uint256 eventId) external {
+        SynapseLibrary.AppStorage storage s = SynapseLibrary.diamondStorage();
+        
+        if (s.reentrancyGuard == 1) revert ReentrancyGuard();
+        s.reentrancyGuard = 1;
+        
+        SynapseLibrary.Event storage evt = s.events[eventId];
+        
+        if (evt.organizer != msg.sender) revert NotOrganizer();
+        if (evt.state != SynapseLibrary.STATE_SETTLING) revert InvalidState();
+        
+        uint256 payout = evt.escrowBalance;
+        evt.escrowBalance = 0;
+        evt.state = SynapseLibrary.STATE_FINALIZED;
+        
+        emit EventFinalized(eventId, payout);
+        
+        (bool success, ) = evt.organizer.call{value: payout}("");
+        if (!success) revert TransferFailed();
+        
+        s.reentrancyGuard = 0;
+    }
+
 }
