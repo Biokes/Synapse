@@ -42,8 +42,17 @@ describe("EventLifecycleFacet", function () {
             eventFacetImpl.interface.getFunction("getEvent")!.selector,
         ];
 
-        const diamondCutFacet = await ethers.getContractAt("SynapseDiamond", await diamond.getAddress());
+        const diamondCutFacetInstance = await ethers.getContractAt("IDiamondCut", await diamond.getAddress());
+
+        const cut = [{
+            facetAddress: facetAddress,
+            action: 0, // Add
+            functionSelectors: selectors
+        }];
+
+        await diamondCutFacetInstance.facetCut(cut, ethers.ZeroAddress, "0x");
 
         eventFacet = await ethers.getContractAt("EventLifecycleFacet", await diamond.getAddress());
     });
 });
+
