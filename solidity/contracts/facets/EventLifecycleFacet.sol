@@ -64,4 +64,17 @@ contract EventLifecycleFacet {
         emit EventActivated(eventId);
     }
 
+    function beginSettlement(uint256 eventId) external {
+        SynapseLibrary.AppStorage storage s = SynapseLibrary.diamondStorage();
+        SynapseLibrary.Event storage evt = s.events[eventId];
+        
+        if (evt.organizer != msg.sender) revert NotOrganizer();
+        if (evt.state != SynapseLibrary.STATE_ACTIVE) revert InvalidState();
+        if (block.timestamp < evt.endTime) revert InvalidTimestamp();
+        
+        evt.state = SynapseLibrary.STATE_SETTLING;
+        
+        emit EventSettling(eventId);
+    }
+
 }
